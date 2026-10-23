@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#05080c">
-<title>tracka·packet — where your packets really go</title>
+<title>tracka·packet: where your packets really go</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060a13'/%3E%3Ctext x='32' y='46' font-size='38' text-anchor='middle'%3E%F0%9F%8C%90%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -167,7 +167,7 @@ canvas#map.drag{cursor:grabbing}
   <div><span class="sw cw"></span>submarine cables (real geometry, telegeography)</div>
   <div><span class="sw rt"></span>your packet's path</div>
   <div><span class="sw uc"></span>unconfirmed final leg (router went silent)</div>
-  <div><span class="sw rg"></span>registry location — physically impossible at that RTT</div>
+  <div><span class="sw rg"></span>registry location: physically impossible at that RTT</div>
 </div>
 <div id="zoomhint">SCROLL ZOOM · DRAG PAN<br>DOUBLE-CLICK REFIT</div>
 
@@ -286,22 +286,22 @@ function buildRoute(tr){
   }
   const originNode={pos:OPOS,lines:["YOU · "+(ORIGIN.geo.city||"?").toUpperCase(),ORIGIN.ip+" · JIO FIBER"],kind:"origin",ghost:[]};
   nodes.push(originNode);
-  events.push({at:0,cls:"ok",html:"<b>t=0</b> — packet leaves your machine via <b>"+ORIGIN.ip+"</b> ("+shortAS(ORIGIN.geo.as)+", "+ORIGIN.geo.city+")"});
+  events.push({at:0,cls:"ok",html:"<b>t=0</b> · packet leaves your machine via <b>"+ORIGIN.ip+"</b> ("+shortAS(ORIGIN.geo.as)+", "+ORIGIN.geo.city+")"});
   let cur=originNode, curPos=OPOS, curCC=ORIGIN.geo.cc, curCity=ORIGIN.geo.city, silentRun=0, privRun=[], km=0;
   let ghostBuf=null;
   const flushGhosts=()=>{
     if(!ghostBuf)return;
     const g0=ghostBuf.items[0],n=ghostBuf.items.length;
     const rtts=ghostBuf.items.map(x=>x.h.rtt).filter(x=>x!=null);
-    const rttTxt=rtts.length>1?Math.min(...rtts).toFixed(0)+"–"+Math.max(...rtts).toFixed(0)+" ms":(rtts[0]||"?")+" ms";
+    const rttTxt=rtts.length>1?Math.min(...rtts).toFixed(0)+"-"+Math.max(...rtts).toFixed(0)+" ms":(rtts[0]||"?")+" ms";
     const near=curCity||"here";
     if(n===1&&g0.why==="detour"){
-      events.push({at:km,cls:"warnc",html:"hop "+g0.h.n+" · <b>"+g0.h.ip+"</b> claims <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span> — but the very next hop is back near "+near+", an absurd detour. Registry location, not physical; skipping the fake side-trip."});
+      events.push({at:km,cls:"warnc",html:"hop "+g0.h.n+" · <b>"+g0.h.ip+"</b> claims <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span>, but the very next hop is back near "+near+", an absurd detour. Registry location, not physical; skipping the fake side-trip."});
     }else if(n===1){
       const need=(2*geod(OPOS,[g0.g.lon,g0.g.lat])/FIBER_KM_PER_MS).toFixed(0);
-      events.push({at:km,cls:"warnc",html:"hop "+g0.h.n+" · <b>"+g0.h.ip+"</b> claims <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span> — but light in fiber alone needs ≥"+need+" ms for that round trip; measured <b>"+g0.h.rtt+" ms</b> leaves no room for reality. IP <i>registry</i> address; the box is really near "+near+"."});
+      events.push({at:km,cls:"warnc",html:"hop "+g0.h.n+" · <b>"+g0.h.ip+"</b> claims <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span>, but light in fiber alone needs ≥"+need+" ms for that round trip; measured <b>"+g0.h.rtt+" ms</b> leaves no room for reality. IP <i>registry</i> address; the box is really near "+near+"."});
     }else{
-      events.push({at:km,cls:"warnc",html:"hops "+ghostBuf.items.map(x=>x.h.n).join(", ")+" · <b>"+n+" routers</b> all claim <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span> — physically impossible at "+rttTxt+". That's where the IPs are <i>registered</i>; the hardware is really near "+near+"."});
+      events.push({at:km,cls:"warnc",html:"hops "+ghostBuf.items.map(x=>x.h.n).join(", ")+" · <b>"+n+" routers</b> all claim <span class='bad'>"+g0.g.city+", "+g0.g.cc+"</span>: physically impossible at "+rttTxt+". That's where the IPs are <i>registered</i>; the hardware is really near "+near+"."});
     }
     ghostBuf=null;
   };
@@ -309,13 +309,13 @@ function buildRoute(tr){
   const flushPriv=()=>{
     if(!privRun.length)return;
     const a=privRun[0].n,b=privRun[privRun.length-1].n;
-    events.push({at:km,cls:"",html:"hops "+a+"–"+b+" — <b>"+privRun.length+" private routers</b> (RFC1918 addresses): your router, then Jio's carrier-grade NAT maze. Invisible to the outside world."});
+    events.push({at:km,cls:"",html:"hops "+a+"-"+b+" · <b>"+privRun.length+" private routers</b> (RFC1918 addresses): your router, then Jio's carrier-grade NAT maze. Invisible to the outside world."});
     originNode.lines.push("+"+privRun.length+" PRIVATE HOPS (LAN/CGNAT)");
     privRun=[];
   };
   const flushSilent=()=>{
     if(!silentRun)return;
-    events.push({at:km,cls:"",html:silentRun+" router"+(silentRun>1?"s":"")+" stayed <b>silent</b> — forwarding packets but refusing to introduce "+(silentRun>1?"themselves":"itself")+"."});
+    events.push({at:km,cls:"",html:silentRun+" router"+(silentRun>1?"s":"")+" stayed <b>silent</b>, forwarding packets but refusing to introduce "+(silentRun>1?"themselves":"itself")+"."});
     silentRun=0;
   };
 
@@ -347,7 +347,7 @@ function buildRoute(tr){
     }
     flushSilent();
     // new node + segment
-    const node={pos,lines:[("HOP "+h.n),h.ip,(shortAS(g.as)||g.org||"—").toUpperCase().slice(0,26)+" · "+(g.city||"?").toUpperCase()+" "+g.cc,(h.rtt!=null?h.rtt.toFixed(0)+" ms":"")],kind:"hop",ghost:[]};
+    const node={pos,lines:[("HOP "+h.n),h.ip,(shortAS(g.as)||g.org||"-").toUpperCase().slice(0,26)+" · "+(g.city||"?").toUpperCase()+" "+g.cc,(h.rtt!=null?h.rtt.toFixed(0)+" ms":"")],kind:"hop",ghost:[]};
     nodes.push(node);
     const seg=makeSeg(curPos,pos,false,curCC===g.cc&&!!g.cc);
     seg.fromNode=cur;seg.toNode=node;segs.push(seg);
@@ -364,7 +364,7 @@ function buildRoute(tr){
     const lastRtt=lastRttOf(tr);
     const feas=dg&&feasibleAt(lastRtt,dDist);
     if(dg&&!feas){
-      arrivalNote="destination <b>"+tr.dst.ip+"</b> answered in <b>"+lastRtt+" ms</b> — registry says <span class='bad'>"+dg.city+"</span>, physics says it's an <b>edge server here</b>. Your packet never had to leave.";
+      arrivalNote="destination <b>"+tr.dst.ip+"</b> answered in <b>"+lastRtt+" ms</b>: registry says <span class='bad'>"+dg.city+"</span>, physics says it's an <b>edge server here</b>. Your packet never had to leave.";
       cur.lines.push("= DEST (EDGE) · REG:"+dg.city.toUpperCase());
     }else{
       arrivalNote="destination reached.";
@@ -377,10 +377,10 @@ function buildRoute(tr){
       const seg=makeSeg(curPos,dPos,true,curCC===dg.cc&&!!dg.cc);
       seg.fromNode=cur;seg.toNode=node;segs.push(seg);
       km=emitSegEvents(seg,events,km,dg,null);
-      arrivalNote="the last routers never answered, so this leg is <b>unconfirmed</b> (dashed) — drawn to the destination's registered home in <b>"+dg.city+"</b>.";
+      arrivalNote="the last routers never answered, so this leg is <b>unconfirmed</b> (dashed), drawn to the destination's registered home in <b>"+dg.city+"</b>.";
       cur=node;
     }else{
-      arrivalNote="destination sits right here ("+dg.city+") but ignored the final probes — firewalled, not lost.";
+      arrivalNote="destination sits right here ("+dg.city+") but ignored the final probes: firewalled, not lost.";
     }
   }
   const totalKm=segs.reduce((s,x)=>s+x.km,0);
@@ -418,13 +418,13 @@ function emitSegEvents(seg,events,km,g,h){
   if(seg.cable){
     const inTxt=seg.landIn?(" at <b>"+seg.landIn+"</b>"):"";
     const outTxt=seg.landOut?(" near <b>"+seg.landOut+"</b>"):"";
-    events.push({at:km+seg.parts[0].km,cls:"cable",html:(seg.unconfirmed?"(unconfirmed) ":"")+"🌊 dives underwater"+inTxt+" into <b style='color:"+seg.cable.c+"'>"+seg.cable.n+"</b> — <span class='kmx'>"+fmtKm(seg.cableKm)+"</span> along the seabed, resurfacing"+outTxt+"."});
+    events.push({at:km+seg.parts[0].km,cls:"cable",html:(seg.unconfirmed?"(unconfirmed) ":"")+"🌊 dives underwater"+inTxt+" into <b style='color:"+seg.cable.c+"'>"+seg.cable.n+"</b>, <span class='kmx'>"+fmtKm(seg.cableKm)+"</span> along the seabed, resurfacing"+outTxt+"."});
   }
   km+=seg.km;
   if(h&&g){
-    events.push({at:km,cls:seg.unconfirmed?"warnc":"",html:"hop "+h.n+" · surfaces in <b>"+(g.city||"?")+", "+g.cc+"</b> — "+(shortAS(g.as)||g.org||"unknown network")+" (<b>"+(h.rtt!=null?h.rtt+" ms":"?")+"</b>)"});
+    events.push({at:km,cls:seg.unconfirmed?"warnc":"",html:"hop "+h.n+" · surfaces in <b>"+(g.city||"?")+", "+g.cc+"</b> · "+(shortAS(g.as)||g.org||"unknown network")+" (<b>"+(h.rtt!=null?h.rtt+" ms":"?")+"</b>)"});
   }else if(g){
-    events.push({at:km,cls:"warnc",html:"…dashed to <b>"+(g.city||"?")+", "+g.cc+"</b> ("+shortAS(g.as)+") — destination's registered location."});
+    events.push({at:km,cls:"warnc",html:"…dashed to <b>"+(g.city||"?")+", "+g.cc+"</b> ("+shortAS(g.as)+"): destination's registered location."});
   }
   return km;
 }
@@ -528,7 +528,7 @@ function renderTabs(){
   for(const tr of TRACEDATA.traces){
     const b=document.createElement("button");b.className="tab";b.dataset.id=tr.id;
     const rtt=lastRttOf(tr);
-    b.innerHTML=tr.title+"<small>"+tr.region+" · "+(rtt?rtt.toFixed(0)+" ms":"—")+"</small>";
+    b.innerHTML=tr.title+"<small>"+tr.region+" · "+(rtt?rtt.toFixed(0)+" ms":"-")+"</small>";
     b.onclick=()=>selectTrace(tr,false);
     t.appendChild(b);
   }
@@ -785,7 +785,7 @@ async function geolocateHops(parsed,statEl){
 document.getElementById("pastego").onclick=async()=>{
   const stat=document.getElementById("pastestat");
   const parsed=parseTraceText(document.getElementById("pastein").value);
-  if(!parsed.hops.length){stat.textContent="couldn't parse any hops — paste raw traceroute output";return;}
+  if(!parsed.hops.length){stat.textContent="couldn't parse any hops: paste raw traceroute output";return;}
   const geos=await geolocateHops(parsed,stat);
   for(const h of parsed.hops)if(h.kind==="public")h.geo=geos[h.ip]||null;
   let reached=false;
@@ -796,7 +796,7 @@ document.getElementById("pastego").onclick=async()=>{
   TRACEDATA.traces.push(tr);
   renderTabs();stat.textContent="";pbox.hidden=true;
   selectTrace(tr,false);
-  if(sat)ROUTE.events.splice(1,0,{at:1,cls:"cable",html:"🛰 <b>STARLINK detected</b> — your first hop bounces ~550 km up to a LEO satellite and back down to a ground station. The rare packet that actually flies."});
+  if(sat)ROUTE.events.splice(1,0,{at:1,cls:"cable",html:"🛰 <b>STARLINK detected</b>: your first hop bounces ~550 km up to a LEO satellite and back down to a ground station. The rare packet that actually flies."});
 };
 
 /* ══════════════ boot ══════════════ */
