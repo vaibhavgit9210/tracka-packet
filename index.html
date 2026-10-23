@@ -130,6 +130,8 @@ canvas#map.drag{cursor:grabbing}
   :root{--glass:#0a1118}
   .tab,#controls button{-webkit-backdrop-filter:none;backdrop-filter:none}
 }
+  /* canvas text keeps the browser's default smoothing: body's antialiased would thin it on macOS */
+  canvas{-webkit-font-smoothing:auto}
 </style>
 </head>
 <body>
